@@ -132,7 +132,10 @@ public class UpgradeActivity extends AppCompatActivity implements BillingProcess
 
         // Bypass Upgrade -------------------
         PreferenceHelper.setPro();
-        return;
+        // Nasty If to avoid unreachable code exception
+        if(true){
+            return;
+        }
         // -----------------------------------
         
         boolean found = false;
@@ -172,7 +175,10 @@ public class UpgradeActivity extends AppCompatActivity implements BillingProcess
         
         // Bypass Upgrade -------------------
         PreferenceHelper.setPro();
-        return;
+        // Nasty If to avoid unreachable code exception
+        if(true){
+            return;
+        }
         // -----------------------------------
 
         readyToPurchase = true;

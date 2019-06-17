@@ -349,6 +349,7 @@ public class StatisticsFragment extends Fragment {
 
             final int color = ThemeHelper.getColor(getActivity(), labelAndColor.color);
             mOverview.today.setTextColor(color);
+            mOverview.yesterday.setTextColor(color);
             mOverview.week.setTextColor(color);
             mOverview.month.setTextColor(color);
             mOverview.total.setTextColor(color);

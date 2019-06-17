@@ -14,6 +14,6 @@
 package com.apps.adrcotfas.goodtime.Statistics.Main;
 
 public enum SpinnerStatsType {
-    NR_OF_SESSIONS,
-    DURATION
+    DURATION,
+    NR_OF_SESSIONS
 }
