@@ -19,8 +19,12 @@ public class Constants {
     public static final int DEFAULT_BREAK_DURATION_DEFAULT = 5;
     public static final int DEFAULT_LONG_BREAK_DURATION        = 15;
     public static final int DEFAULT_SESSIONS_BEFORE_LONG_BREAK = 4;
-    public static final int DEFAULT_WORK_DURATION_5217         = 52;
-    public static final int DEFAULT_BREAK_DURATION_5217        = 17;
+
+    public static final int DEFAULT_WORK_DURATION_5010 = 50;
+    public static final int DEFAULT_BREAK_DURATION_5010 = 10;
+    
+    public static final int DEFAULT_WORK_DURATION_1005 = 10;
+    public static final int DEFAULT_BREAK_DURATION_1005 = 5;
 
     public static final String sku = "upgraded_version";
 

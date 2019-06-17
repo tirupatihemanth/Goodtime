@@ -321,9 +321,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Activi
             toggleLongBreakPreference(false);
             mPrefLongBreakDuration.setValue(Constants.DEFAULT_LONG_BREAK_DURATION);
             mPrefSessionsBeforeLongBreak.setValue(Constants.DEFAULT_SESSIONS_BEFORE_LONG_BREAK);
-        } else if (newValue.equals(getResources().getText(R.string.pref_profile_5217))) {
-            mPrefWorkDuration.setValue(Constants.DEFAULT_WORK_DURATION_5217);
-            mPrefBreakDuration.setValue(Constants.DEFAULT_BREAK_DURATION_5217);
+        } else if (newValue.equals(getResources().getText(R.string.pref_profile_5010))) {
+            mPrefWorkDuration.setValue(Constants.DEFAULT_WORK_DURATION_5010);
+            mPrefBreakDuration.setValue(Constants.DEFAULT_BREAK_DURATION_5010);
+            mPrefEnableLongBreak.setChecked(false);
+            toggleLongBreakPreference(false);
+        } else if (newValue.equals(getResources().getText(R.string.pref_profile_1005))) {
+            mPrefWorkDuration.setValue(Constants.DEFAULT_WORK_DURATION_1005);
+            mPrefBreakDuration.setValue(Constants.DEFAULT_BREAK_DURATION_1005);
             mPrefEnableLongBreak.setChecked(false);
             toggleLongBreakPreference(false);
         }

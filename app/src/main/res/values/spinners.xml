@@ -2,11 +2,13 @@
 <resources>
 
     <string name="pref_profile_default" translatable="false">25/5</string>
-    <string name="pref_profile_5217" translatable="false">52/17</string>
-
+    <string name="pref_profile_5010" translatable="false">50/10</string>
+    <string name="pref_profile_1005" translatable="false">10/5</string>
+    
     <string-array name="pref_profiles">
         <item>@string/pref_profile_default</item>
-        <item>@string/pref_profile_5217</item>
+        <item>@string/pref_profile_5010</item>
+        <item>@string/pref_profile_1005</item>
     </string-array>
 
     <string-array name="pref_timer_style">
