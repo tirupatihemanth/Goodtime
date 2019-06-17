@@ -129,6 +129,12 @@ public class UpgradeActivity extends AppCompatActivity implements BillingProcess
 
     @Override
     public void onPurchaseHistoryRestored() {
+
+        // Bypass Upgrade -------------------
+        PreferenceHelper.setPro();
+        return;
+        // -----------------------------------
+        
         boolean found = false;
         for(String sku : mBillingProcessor.listOwnedProducts()) {
             if (sku.equals(Constants.sku)) {
@@ -163,6 +169,12 @@ public class UpgradeActivity extends AppCompatActivity implements BillingProcess
 
     @Override
     public void onBillingInitialized() {
+        
+        // Bypass Upgrade -------------------
+        PreferenceHelper.setPro();
+        return;
+        // -----------------------------------
+
         readyToPurchase = true;
         mBillingProcessor.loadOwnedPurchasesFromGoogle();
         if (mBillingProcessor.isPurchased(Constants.sku)) {
