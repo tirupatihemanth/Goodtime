@@ -113,6 +113,7 @@
     <string name="statistics_history">History</string>
     <string name="statistics_overview">Overview</string>
     <string name="statistics_today">Today</string>
+    <string name="statistics_yesterday">Yesterday</string>
     <string name="statistics_week">Week</string>
     <string name="statistics_this_week">This week</string>
     <string name="statistics_this_month">This month</string>

@@ -4,7 +4,7 @@
     <string name="pref_profile_default" translatable="false">25/5</string>
     <string name="pref_profile_5010" translatable="false">50/10</string>
     <string name="pref_profile_1005" translatable="false">10/5</string>
-    
+
     <string-array name="pref_profiles">
         <item>@string/pref_profile_default</item>
         <item>@string/pref_profile_5010</item>
@@ -28,8 +28,8 @@
     </string-array>
 
     <string-array name="spinner_stats_type">
-        <item>@string/spinner_stats_nr_of_sessions</item>
         <item>@string/spinner_stats_duration</item>
+        <item>@string/spinner_stats_nr_of_sessions</item>
     </string-array>
 
     <string-array name="spinner_range_type">

@@ -78,12 +78,14 @@ public class StatisticsFragment extends Fragment {
     //TODO: move to separate file
     private class Stats {
         long today;
+        long yesterday;
         long week;
         long month;
         long total;
 
-        Stats(long today, long week, long month, long total) {
+        Stats(long today, long yesterday, long week, long month, long total) {
             this.today = today;
+            this.yesterday = yesterday;
             this.week  = week;
             this.month = month;
             this.total = total;
@@ -93,12 +95,14 @@ public class StatisticsFragment extends Fragment {
     //TODO: move to separate file and remove duplicate code
     private class StatsView {
         TextView today;
+        TextView yesterday;
         TextView week;
         TextView month;
         TextView total;
 
-        StatsView(TextView today, TextView week, TextView month, TextView total) {
+        StatsView(TextView today, TextView yesterday, TextView week, TextView month, TextView total) {
             this.today = today;
+            this.yesterday = yesterday;
             this.week  = week;
             this.month = month;
             this.total = total;
@@ -148,12 +152,14 @@ public class StatisticsFragment extends Fragment {
 
         mOverview = new StatsView(
                 binding.overview.todayValue,
+                binding.overview.yesterdayValue,
                 binding.overview.weekValue,
                 binding.overview.monthValue,
                 binding.overview.totalValue);
 
         mOverviewDescription = new StatsView(
                 binding.overview.todayDescription,
+                binding.overview.yesterdayDescription,
                 binding.overview.weekDescription,
                 binding.overview.monthDescription,
                 binding.overview.totalDescription
@@ -194,12 +200,13 @@ public class StatisticsFragment extends Fragment {
         final boolean isDurationType = mStatsType.getSelectedItemPosition() == DURATION.ordinal();
 
         final LocalDate today          = new LocalDate();
+        final LocalDate yesterday      = today.minusDays(1);
         final LocalDate thisWeekStart  = today.dayOfWeek().withMinimumValue();
         final LocalDate thisWeekEnd    = today.dayOfWeek().withMaximumValue();
         final LocalDate thisMonthStart = today.dayOfMonth().withMinimumValue();
         final LocalDate thisMonthEnd   = today.dayOfMonth().withMaximumValue();
 
-        Stats stats = new Stats(0, 0, 0, 0);
+        Stats stats = new Stats(0, 0, 0, 0, 0);
 
         for (Session s : sessions) {
             final Long increment = isDurationType ? s.totalTime : 1L;
@@ -207,6 +214,9 @@ public class StatisticsFragment extends Fragment {
             final LocalDate crt = new LocalDate(new Date(s.endTime));
             if (crt.isEqual(today)) {
                 stats.today += increment;
+            }
+            if(crt.isEqual(yesterday)) {
+                stats.yesterday += increment;
             }
             if (crt.isAfter(thisWeekStart.minusDays(1)) && crt.isBefore(thisWeekEnd.plusDays(1))) {
                 stats.week += increment;
@@ -225,6 +235,9 @@ public class StatisticsFragment extends Fragment {
         mOverview.today.setText(isDurationType
                 ? formatMinutes(stats.today)
                 : formatLong(stats.today));
+        mOverview.yesterday.setText(isDurationType
+                ? formatMinutes(stats.yesterday)
+                : formatLong(stats.yesterday));
         mOverview.week.setText(isDurationType
                 ? formatMinutes(stats.week)
                 : formatLong(stats.week));

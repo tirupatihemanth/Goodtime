@@ -70,6 +70,28 @@
                     android:gravity="center">
 
                     <TextView
+                        android:id="@+id/yesterday_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/OverviewTextValue"/>
+
+                    <TextView
+                        android:id="@+id/yesterday_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/OverviewTextDescription"
+                        android:text="@string/statistics_yesterday"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
                         android:id="@+id/week_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
