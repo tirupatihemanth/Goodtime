@@ -81,6 +81,30 @@ public class StringUtils {
         return result;
     }
 
+    public static String formatMinutesToHHMM(long minutes){
+        final long hours = minutes / 60;
+        final long remMin = minutes % 60;
+
+        if (minutes == 0) {
+            return "0m";
+        }
+
+        if (hours == 0) {
+            return prefixZeroString(remMin) + "m";
+        }
+
+        return remMin == 0 ? Long.toString(hours) + "h" 
+                        : Long.toString(hours) + ":" + prefixZeroString(remMin);
+    }
+
+    private static String prefixZeroString(long number){
+        if(number < 10) {
+            return "0"+Long.toString(number);
+        }
+
+        return Long.toString(number);
+    }
+
     public static String formatDate(long millis) {
         return monthFormatter.print(millis);
     }

@@ -67,9 +67,7 @@ import androidx.lifecycle.ViewModelProviders;
 import static com.apps.adrcotfas.goodtime.Statistics.Main.SpinnerProductiveTimeType.DAY_OF_WEEK;
 import static com.apps.adrcotfas.goodtime.Statistics.Main.SpinnerProductiveTimeType.HOUR_OF_DAY;
 import static com.apps.adrcotfas.goodtime.Statistics.Main.SpinnerStatsType.DURATION;
-import static com.apps.adrcotfas.goodtime.Util.StringUtils.formatLong;
-import static com.apps.adrcotfas.goodtime.Util.StringUtils.formatMinutes;
-import static com.apps.adrcotfas.goodtime.Util.StringUtils.toPercentage;
+import static com.apps.adrcotfas.goodtime.Util.StringUtils.*;
 
 public class StatisticsFragment extends Fragment {
 
@@ -242,10 +240,10 @@ public class StatisticsFragment extends Fragment {
                 ? formatMinutes(stats.week)
                 : formatLong(stats.week));
         mOverview.month.setText(isDurationType
-                ? formatMinutes(stats.month)
+                ? formatMinutesToHHMM(stats.month)
                 : formatLong(stats.month));
         mOverview.total.setText(isDurationType
-                ? formatMinutes(stats.total)
+                ? formatMinutesToHHMM(stats.total)
                 : formatLong(stats.total));
 
         mOverviewDescription.week.setText(
@@ -393,6 +391,7 @@ public class StatisticsFragment extends Fragment {
 
         mChartHistory.getAxisLeft().setAxisMinimum(0f);
         mChartHistory.getAxisLeft().setAxisMaximum(isDurationType ? 60f : 6f);
+        mChartHistory.getAxisLeft().setValueFormatter(new CustomYAxisFormatter(SpinnerStatsType.values()[mStatsType.getSelectedItemPosition()]));
 
         final int visibleXCount = (int) ThemeHelper.pxToDp(getContext(), mChartHistory.getWidth()) / 36;
         mChartHistory.setVisibleXRangeMaximum(visibleXCount);
@@ -405,6 +404,8 @@ public class StatisticsFragment extends Fragment {
         }
 
         // this part is to align the history chart to the productive time chart by setting the same width
+        // Ignoring this alignment since HHMM format doesn't fit
+        
         TextPaint p = new TextPaint();
         p.setTextSize(getResources().getDimension(R.dimen.tinyTextSize));
         int widthOfOtherChart = (int) ThemeHelper.pxToDp(getContext(), (int) p.measureText("100%"));
@@ -421,9 +422,13 @@ public class StatisticsFragment extends Fragment {
                 mChartHistory.getTransformer(YAxis.AxisDependency.LEFT)));
 
         YAxis yAxis = mChartHistory.getAxisLeft();
-        yAxis.setValueFormatter(new CustomYAxisFormatter());
+
+        final SpinnerStatsType statsType = 
+                SpinnerStatsType.values()[mStatsType.getSelectedItemPosition()];
+
+        yAxis.setValueFormatter(new CustomYAxisFormatter(statsType));
         yAxis.setTextColor(getResources().getColor(R.color.grey_500));
-        yAxis.setTextSize(getResources().getDimension(R.dimen.tinyTextSize) / mDisplayDensity);
+        yAxis.setTextSize(getResources().getDimension(R.dimen.veryTinyTextSize) / mDisplayDensity);
         yAxis.setDrawAxisLine(false);
 
         XAxis xAxis = mChartHistory.getXAxis();
