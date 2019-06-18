@@ -63,6 +63,7 @@ public class ProperSeekBarPreference extends Preference {
     private final String mDialogTitle;
 
     private static final String TAG = "ProperSeekBarPreference";
+    public final static String SESSIONS_BEFORE_LONG_BREAK  = "pref_sessions_before_long_break";
 
     /**
      * Listener reacting to the SeekBar changing value by the user
@@ -316,6 +317,11 @@ public class ProperSeekBarPreference extends Preference {
      */
     private void syncValueInternal(SeekBar seekBar) {
         int seekBarValue = mMin + seekBar.getProgress();
+        
+        if(!SESSIONS_BEFORE_LONG_BREAK.equals(getKey())){
+            seekBarValue = seekBarValue < 5 ? seekBarValue : seekBarValue / 5 * 5;
+        }
+
         if (seekBarValue != mSeekBarValue) {
             if (callChangeListener(seekBarValue)) {
                 setValueInternal(seekBarValue, false);
