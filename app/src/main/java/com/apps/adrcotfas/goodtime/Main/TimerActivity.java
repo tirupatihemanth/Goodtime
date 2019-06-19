@@ -45,6 +45,7 @@ import com.apps.adrcotfas.goodtime.LabelAndColor;
 import com.apps.adrcotfas.goodtime.R;
 import com.apps.adrcotfas.goodtime.Session;
 import com.apps.adrcotfas.goodtime.Settings.SettingsActivity;
+import com.apps.adrcotfas.goodtime.Statistics.Main.StatisticsActivity;
 import com.apps.adrcotfas.goodtime.Statistics.Main.SelectLabelDialog;
 import com.apps.adrcotfas.goodtime.Statistics.SessionViewModel;
 import com.apps.adrcotfas.goodtime.Util.Constants;
@@ -141,6 +142,7 @@ public class TimerActivity
             } else {
                 startService(skipIntent);
             }
+            toggleKeepScreenOn(PreferenceHelper.isScreenOnEnabled());
         }
     }
 
@@ -283,8 +285,8 @@ public class TimerActivity
 
             @Override
             public void onLongClick(View view) {
-                Intent settingsIntent = new Intent(TimerActivity.this, SettingsActivity.class);
-                startActivity(settingsIntent);
+                Intent statisticsIntent = new Intent(TimerActivity.this, StatisticsActivity.class);
+                startActivity(statisticsIntent);
             }
 
             @Override
@@ -342,7 +344,6 @@ public class TimerActivity
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref.registerOnSharedPreferenceChangeListener(this);
-        toggleKeepScreenOn(PreferenceHelper.isScreenOnEnabled());
         toggleFullscreenMode();
 
         mBillingHelper.refresh();
@@ -557,15 +558,21 @@ public class TimerActivity
     }
 
     private void start(SessionType sessionType) {
+
         Intent startIntent = new Intent();
         switch (mCurrentSession.getTimerState().getValue()) {
             case INACTIVE:
                 startIntent = new IntentWithAction(TimerActivity.this, TimerService.class,
                         Constants.ACTION.START, sessionType);
+                toggleKeepScreenOn(PreferenceHelper.isScreenOnEnabled());
                 break;
             case ACTIVE:
+                startIntent = new IntentWithAction(TimerActivity.this, TimerService.class, Constants.ACTION.TOGGLE);
+                toggleKeepScreenOn(false);
+                break;
             case PAUSED:
                 startIntent = new IntentWithAction(TimerActivity.this, TimerService.class, Constants.ACTION.TOGGLE);
+                toggleKeepScreenOn(PreferenceHelper.isScreenOnEnabled());
                 break;
             default:
                 Log.wtf(TAG, "Invalid timer state.");
@@ -585,6 +592,7 @@ public class TimerActivity
         } else {
             startService(stopIntent);
         }
+        toggleKeepScreenOn(false);
     }
 
     private void add60Seconds() {
@@ -676,9 +684,8 @@ public class TimerActivity
                     mCurrentSession.setDuration(TimeUnit.MINUTES.toMillis(PreferenceHelper.getSessionDuration(SessionType.WORK)));
                 }
                 break;
-            case ENABLE_SCREEN_ON:
-                toggleKeepScreenOn(PreferenceHelper.isScreenOnEnabled());
-                break;
+        
+            // Removed case ENABLE_SCREEN_ON as we want to keep screen on only when the timer is running
             case AMOLED:
                 recreate();
             case ENABLE_SCREENSAVER_MODE:
