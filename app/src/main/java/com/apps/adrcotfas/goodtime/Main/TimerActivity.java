@@ -628,6 +628,7 @@ public class TimerActivity
 
     private void showFinishDialog(SessionType sessionType) {
         if (mViewModel.isActive) {
+            toggleKeepScreenOn(false);
             Log.i(TAG, "Showing the finish dialog.");
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             if (sessionType == SessionType.WORK) {
