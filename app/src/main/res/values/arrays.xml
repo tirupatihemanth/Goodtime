@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="action_motivation_array">
+        <item>Get more done in less time</item>
+        <item>Active Recall - Test your memory</item>
+        <item>Spaced Repition - Keep testing your memory</item>
+        <item>Productivity requires health mind &amp; body</item>
+        <item>Healthy mind requires IDLE time</item>
+        <item>Healthy body depends on what you consume</item>
+    </string-array>
+</resources>

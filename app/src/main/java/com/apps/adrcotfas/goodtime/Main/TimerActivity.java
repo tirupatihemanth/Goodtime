@@ -378,6 +378,19 @@ public class TimerActivity
     }
 
     @Override
+    protected void onStop() {
+        // System.out.println("GOODTIME: In onStop: "+ getLifecycle().getCurrentState().name());
+        super.onStop();
+        if(mCurrentSession.getSessionType().getValue() == SessionType.WORK) {
+
+            if(mCurrentSession.getTimerState().getValue() == TimerState.ACTIVE
+                || mCurrentSession.getTimerState().getValue() == TimerState.PAUSED) {
+                EventBus.getDefault().post(new Constants.FocusLostEvent());
+            }
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu_main, menu);

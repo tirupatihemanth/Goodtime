@@ -32,6 +32,7 @@ import com.apps.adrcotfas.goodtime.Util.Constants;
 import com.apps.adrcotfas.goodtime.Util.IntentWithAction;
 
 import java.util.concurrent.TimeUnit;
+import java.util.Random;
 
 /**
  * Class responsible with creating and updating notifications for the foreground {@link TimerService}
@@ -42,7 +43,9 @@ public class NotificationHelper extends ContextWrapper {
 
     private static final String TAG = NotificationHelper.class.getSimpleName();
     private static final String GOODTIME_NOTIFICATION = "goodtime.notification";
+    private static final String GOODTIME_ALERT = "goodtime.alert";
     public static final int GOODTIME_NOTIFICATION_ID = 42;
+    public static final int FOCUS_LOST_ID = 43;
     private static final int START_WORK_ID = 33;
     private static final int SKIP_BREAK_ID = 34;
     private static final int START_BREAK_ID = 35;
@@ -52,9 +55,11 @@ public class NotificationHelper extends ContextWrapper {
 
     private final NotificationManager mManager;
     private final NotificationCompat.Builder mBuilder;
+    private final Context mContext;
 
     public NotificationHelper(Context context) {
         super(context);
+        mContext = context;
         mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             initChannels();
@@ -83,6 +88,11 @@ public class NotificationHelper extends ContextWrapper {
                         .build());
     }
 
+    public void notifyFocusLost(){
+        Log.v(TAG, "notifyFocusLost");
+        mManager.notify(FOCUS_LOST_ID, getFocusLostBuilder().build());
+    }
+
     public void clearNotification() {
         mManager.cancelAll();
     }
@@ -105,6 +115,13 @@ public class NotificationHelper extends ContextWrapper {
         channelInProgress.setShowBadge(true);
         channelInProgress.setSound(null, null);
         mManager.createNotificationChannel(channelInProgress);
+
+        NotificationChannel channelAlerts = new NotificationChannel(
+                GOODTIME_ALERT, getString(R.string.notification_channel_alerts),
+                NotificationManager.IMPORTANCE_HIGH);
+        channelAlerts.setBypassDnd(true);
+        channelAlerts.setShowBadge(true);
+        mManager.createNotificationChannel(channelAlerts);
     }
 
     /**
@@ -137,6 +154,23 @@ public class NotificationHelper extends ContextWrapper {
         }
 
         return mBuilder;
+    }
+
+
+    private NotificationCompat.Builder getFocusLostBuilder(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, GOODTIME_ALERT)
+                .setSmallIcon(R.drawable.ic_status_goodtime)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setAutoCancel(true)
+                .setContentIntent(createActivityIntent())
+                .setOngoing(false)
+                .setShowWhen(false);
+        String[] motivationStringArray = mContext.getResources().getStringArray(R.array.action_motivation_array);
+        builder.setContentTitle(getString(R.string.action_focus_lost))
+            .setContentText( motivationStringArray[new Random().nextInt(motivationStringArray.length)]);
+        return builder;
     }
 
     private NotificationCompat.Builder getFinishedSessionBuilder(SessionType sessionType) {
