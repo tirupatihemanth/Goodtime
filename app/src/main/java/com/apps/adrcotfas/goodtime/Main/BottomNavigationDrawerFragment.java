@@ -114,10 +114,6 @@ public class BottomNavigationDrawerFragment extends BottomSheetDialogFragment {
                         launchUpgradeActivity(getContext());
                     }
                     break;
-                case R.id.action_settings:
-                    Intent settingsIntent = new Intent(getActivity(), SettingsActivity.class);
-                    startActivity(settingsIntent);
-                    break;
                 case R.id.action_statistics:
                     Intent statisticsIntent = new Intent(getActivity(), StatisticsActivity.class);
                     startActivity(statisticsIntent);

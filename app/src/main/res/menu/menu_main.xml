@@ -17,8 +17,14 @@
         app:showAsAction="always"/>
 
     <item android:id="@+id/action_current_label"
-        android:icon="@drawable/ic_dots"
+        android:icon="@drawable/ic_label"
         android:title="@string/label_current"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/settings"
         app:showAsAction="always"/>
 
 </menu>

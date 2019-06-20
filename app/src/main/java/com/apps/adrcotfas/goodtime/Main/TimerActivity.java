@@ -414,6 +414,10 @@ public class TimerActivity
                     launchUpgradeActivity(this);
                 }
                 break;
+            case R.id.action_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                break;
             case R.id.action_sessions_counter:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.action_reset_counter_title)
