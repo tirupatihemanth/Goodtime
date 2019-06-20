@@ -150,7 +150,6 @@ public class TimerActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
-
         if (PreferenceHelper.isFirstRun()) {
             // show app intro
             Intent i = new Intent(TimerActivity.this, MainIntroActivity.class);
@@ -571,7 +570,6 @@ public class TimerActivity
     }
 
     private void start(SessionType sessionType) {
-
         Intent startIntent = new Intent();
         switch (mCurrentSession.getTimerState().getValue()) {
             case INACTIVE:
@@ -580,6 +578,7 @@ public class TimerActivity
                 toggleKeepScreenOn(PreferenceHelper.isScreenOnEnabled());
                 break;
             case ACTIVE:
+                if(!PreferenceHelper.isPauseEnabled()) return;
                 startIntent = new IntentWithAction(TimerActivity.this, TimerService.class, Constants.ACTION.TOGGLE);
                 toggleKeepScreenOn(false);
                 break;
@@ -699,6 +698,9 @@ public class TimerActivity
                 break;
         
             // Removed case ENABLE_SCREEN_ON as we want to keep screen on only when the timer is running
+            case ENABLE_SCREEN_ON:
+                toggleKeepScreenOn(mCurrentSession.getTimerState().getValue() == TimerState.ACTIVE ? PreferenceHelper.isScreenOnEnabled() : false);
+                break;
             case AMOLED:
                 recreate();
             case ENABLE_SCREENSAVER_MODE:
