@@ -79,7 +79,8 @@
     <string name="action_finished_session">Session finished</string>
     <string name="action_press_back_button">Press the back button again to exit</string>
     <string name = "action_focus_lost">Get back to work</string>
-
+    <string name = "action_progress_lost_title">Session Lost!</string>
+    <string name = "action_progress_lost_text">Your timer has been reset!</string>
     <string name="tutorial_tap">Tap the timer to start and pause</string>
     <string name="tutorial_swipe_left">Swipe left or right to skip the current session</string>
     <string name="tutorial_swipe_up">Swipe up to add one more minute</string>

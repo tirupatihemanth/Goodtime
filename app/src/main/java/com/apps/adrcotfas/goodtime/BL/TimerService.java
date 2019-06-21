@@ -129,12 +129,14 @@ public class TimerService extends LifecycleService {
             mRingtoneAndVibrationPlayer.stop();
         } else if (o instanceof Constants.FocusLostEvent){
             Log.d(TAG, "onEvent " + o.getClass().getSimpleName());
-            onFocusLostEvent(SessionType.WORK);
+            onFocusLostEvent();
         }
     }
 
-    private void onFocusLostEvent(SessionType sessionType){
-        mNotificationHelper.notifyFocusLost();
+    private void onFocusLostEvent() {
+        getSessionManager().cancelFocusLostAlarm();
+        onStopEvent();
+        mNotificationHelper.notifySessionReset();
     }
 
     private void onStartEvent(SessionType sessionType) {

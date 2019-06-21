@@ -35,6 +35,7 @@ public class Constants {
         String STOP        = "goodtime.action.stop";
         String FINISHED    = "goodtime.action.finished";
         String ADD_SECONDS = "goodtime.action.addseconds";
+        String FOCUS_LOST  = "goodtime.action.focusLost";
     }
 
     public final static String SESSION_TYPE = "goodtime.session.type";

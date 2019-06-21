@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import de.greenrobot.event.EventBus;
 
 import static com.apps.adrcotfas.goodtime.Util.Constants.ACTION.FINISHED;
+import static com.apps.adrcotfas.goodtime.Util.Constants.ACTION.FOCUS_LOST;
 import static com.apps.adrcotfas.goodtime.Util.Constants.SESSION_TYPE;
 
 /**
@@ -46,6 +47,7 @@ public class CurrentSessionManager extends ContextWrapper{
     private final CurrentSession mCurrentSession;
     private long mRemaining;
     private final AlarmReceiver mAlarmReceiver;
+    private final FocusLostAlarmReceiver mFocusLostAlarmReceiver;
 
     private long mSessionDuration;
 
@@ -53,6 +55,7 @@ public class CurrentSessionManager extends ContextWrapper{
         super(context);
         mCurrentSession = currentSession;
         mAlarmReceiver = new AlarmReceiver();
+        mFocusLostAlarmReceiver = new FocusLostAlarmReceiver();
     }
 
     public void startTimer(SessionType sessionType) {
@@ -138,6 +141,31 @@ public class CurrentSessionManager extends ContextWrapper{
         }
     }
     
+    public void scheduleFocusLostAlarm(){
+        final long triggerAtMillis = 10000 + SystemClock.elapsedRealtime();
+        this.registerReceiver(mFocusLostAlarmReceiver, new IntentFilter(FOCUS_LOST));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getAlarmManager().setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    triggerAtMillis, getFocusLostAlarmPendingIntent());
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getAlarmManager().setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    triggerAtMillis, getFocusLostAlarmPendingIntent());
+        } else {
+            getAlarmManager().set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    triggerAtMillis, getFocusLostAlarmPendingIntent());
+        }
+    }
+
+    public void cancelFocusLostAlarm(){
+        final PendingIntent intent = getFocusLostAlarmPendingIntent();
+        if (intent != null) {
+            getAlarmManager().cancel(intent);
+        }
+        unregisterFocusLostAlarmReceiver();
+    }
+
+
     private void cancelAlarm() {
         final PendingIntent intent = getAlarmPendingIntent(mCurrentSession.getSessionType().getValue());
         if (intent != null) {
@@ -155,6 +183,15 @@ public class CurrentSessionManager extends ContextWrapper{
         }
     }
 
+    private void unregisterFocusLostAlarmReceiver(){
+        try {
+            this.unregisterReceiver(mFocusLostAlarmReceiver);
+            Log.v(TAG, "unregisterFocusLostAlarmReceiver");
+        } catch(IllegalArgumentException e){
+            Log.v(TAG, "Didn't unregister focusLostReceiver");
+        }
+    }
+
     private AlarmManager getAlarmManager() {
         return (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
     }
@@ -163,6 +200,12 @@ public class CurrentSessionManager extends ContextWrapper{
         Intent intent = new Intent(FINISHED);
         intent.putExtra(SESSION_TYPE, sessionType.toString());
         return PendingIntent.getBroadcast(getApplicationContext(), 0,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private PendingIntent getFocusLostAlarmPendingIntent(){
+        Intent intent = new Intent(FOCUS_LOST);
+        return PendingIntent.getBroadcast(getApplicationContext(), 1,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 

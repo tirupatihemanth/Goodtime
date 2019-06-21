@@ -12,7 +12,13 @@
  */
 
 package com.apps.adrcotfas.goodtime.BL;
+
 import android.app.Application;
+import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.OnLifecycleEvent;
+
 import android.content.SharedPreferences;
 
 import java.util.concurrent.TimeUnit;
@@ -27,7 +33,7 @@ import static com.apps.adrcotfas.goodtime.Util.Constants.DEFAULT_WORK_DURATION_D
 /**
  * Maintains a global state of the app and the {@link CurrentSession}
  */
-public class GoodtimeApplication extends Application {
+public class GoodtimeApplication extends Application implements LifecycleObserver {
 
     private static volatile GoodtimeApplication INSTANCE;
     private static CurrentSessionManager mCurrentSessionManager;
@@ -42,6 +48,8 @@ public class GoodtimeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+
         INSTANCE = this;
 
         mPreferences = getSharedPreferences(getPackageName() + "_private_preferences", MODE_PRIVATE);
@@ -51,6 +59,23 @@ public class GoodtimeApplication extends Application {
                 PreferenceManager.getDefaultSharedPreferences(this)
                         .getInt(WORK_DURATION, DEFAULT_WORK_DURATION_DEFAULT))));
 
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    void onAppBackground() {
+        final CurrentSession currentSession = getCurrentSession();
+        if(currentSession.getSessionType().getValue() == SessionType.WORK
+            && currentSession.getTimerState().getValue() == TimerState.ACTIVE) {
+            (new NotificationHelper(getApplicationContext())).notifyFocusLost();
+                mCurrentSessionManager.scheduleFocusLostAlarm();
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    void onAppForeground() {
+        // Each time the app starts we check if there is any alarm out from the previous exit of a work session.
+        // Neverthless calling cancel everytime. If there isn't any alarm then nothing happens
+        getCurrentSessionManager().cancelFocusLostAlarm();
     }
 
     public CurrentSession getCurrentSession() {

@@ -90,11 +90,11 @@ import static com.apps.adrcotfas.goodtime.Util.UpgradeActivityHelper.launchUpgra
 import static java.lang.String.format;
 
 public class TimerActivity
-        extends
-        AppCompatActivity
-        implements
-        SharedPreferences.OnSharedPreferenceChangeListener,
-        SelectLabelDialog.OnLabelSelectedListener{
+extends
+AppCompatActivity
+implements
+SharedPreferences.OnSharedPreferenceChangeListener,
+SelectLabelDialog.OnLabelSelectedListener {
 
     private static final String TAG = TimerActivity.class.getSimpleName();
 
@@ -136,7 +136,7 @@ public class TimerActivity
     private void skip() {
         if (mCurrentSession.getTimerState().getValue() != TimerState.INACTIVE) {
             Intent skipIntent = new IntentWithAction(TimerActivity.this, TimerService.class,
-                    Constants.ACTION.SKIP);
+                Constants.ACTION.SKIP);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(skipIntent);
             } else {
@@ -184,12 +184,12 @@ public class TimerActivity
             selectLabelDialog.dismiss();
         }
 
-		if (!BuildConfig.F_DROID) {
+        if (!BuildConfig.F_DROID) {
             // Monitor launch times and interval from installation
             RateThisApp.onCreate(this);
             // If the condition is satisfied, "Rate this app" dialog will be shown
             RateThisApp.showRateDialogIfNeeded(this);
-		}
+        }
     }
 
     /**
@@ -202,16 +202,16 @@ public class TimerActivity
         if (i < MESSAGE_SIZE) {
 
             final List<String> messages = Arrays.asList(
-                    getString(R.string.tutorial_tap),
-                    getString(R.string.tutorial_swipe_left),
-                    getString(R.string.tutorial_swipe_up),
-                    getString(R.string.tutorial_swipe_down));
+                getString(R.string.tutorial_tap),
+                getString(R.string.tutorial_swipe_left),
+                getString(R.string.tutorial_swipe_up),
+                getString(R.string.tutorial_swipe_down));
 
             final List<Animation> animations = Arrays.asList(
-                    loadAnimation(getApplicationContext(), R.anim.tutorial_tap),
-                    loadAnimation(getApplicationContext(), R.anim.tutorial_swipe_right),
-                    loadAnimation(getApplicationContext(), R.anim.tutorial_swipe_up),
-                    loadAnimation(getApplicationContext(), R.anim.tutorial_swipe_down));
+                loadAnimation(getApplicationContext(), R.anim.tutorial_tap),
+                loadAnimation(getApplicationContext(), R.anim.tutorial_swipe_right),
+                loadAnimation(getApplicationContext(), R.anim.tutorial_swipe_up),
+                loadAnimation(getApplicationContext(), R.anim.tutorial_swipe_down));
 
             mTutorialDot.setVisibility(View.VISIBLE);
             mTutorialDot.animate().translationX(0).translationY(0);
@@ -219,14 +219,14 @@ public class TimerActivity
             mTutorialDot.setAnimation(animations.get(PreferenceHelper.getLastIntroStep()));
 
             Snackbar s = Snackbar.make(mToolbar, messages.get(PreferenceHelper.getLastIntroStep()), Snackbar.LENGTH_INDEFINITE)
-                    .setAction("OK", view -> {
-                        int nextStep = i + 1;
-                        PreferenceHelper.setLastIntroStep(nextStep);
-                        showTutorialSnackbars();
-                    })
-                    .setAnchorView(mToolbar)
+            .setAction("OK", view -> {
+                int nextStep = i + 1;
+                PreferenceHelper.setLastIntroStep(nextStep);
+                showTutorialSnackbars();
+            })
+            .setAnchorView(mToolbar)
                     // TODO: extract style to xml
-                    .setActionTextColor(getResources().getColor(R.color.teal200));
+            .setActionTextColor(getResources().getColor(R.color.teal200));
             s.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.gray1000));
 
             s.setBehavior(new BaseTransientBottomBar.Behavior() {
@@ -299,7 +299,7 @@ public class TimerActivity
                 if (mCurrentSession.getTimerState().getValue() == TimerState.PAUSED) {
                     final Handler handler = new Handler();
                     handler.postDelayed(() -> mTimeLabel.startAnimation(
-                            loadAnimation(getApplicationContext(), R.anim.blink)), 300);
+                        loadAnimation(getApplicationContext(), R.anim.blink)), 300);
                 }
             }
         });
@@ -320,11 +320,12 @@ public class TimerActivity
     @Override
     public void onAttachedToWindow() {
         getWindow().addFlags(FLAG_SHOW_WHEN_LOCKED
-                | FLAG_TURN_SCREEN_ON);
+            | FLAG_TURN_SCREEN_ON);
     }
 
     @Override
     protected void onResume() {
+        // System.out.println("GOODTIME: In onResume: "+ getLifecycle().getCurrentState().name());
         super.onResume();
 
         mViewModel.isActive = true;
@@ -353,83 +354,80 @@ public class TimerActivity
         mBlackCover.animate().alpha(0.f).setDuration(500);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mBillingHelper.refresh();
-    }
+@Override
+protected void onStart() {
+    super.onStart();
+    mBillingHelper.refresh();
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mViewModel.isActive = false;
-    }
+    // System.out.println("GOODTIME: In onStart: "+ getLifecycle().getCurrentState().name());
+}
 
-    @Override
-    protected void onDestroy() {
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        pref.unregisterOnSharedPreferenceChangeListener(this);
-        EventBus.getDefault().unregister(this);
+@Override
+protected void onPause() {
+   // System.out.println("GOODTIME: In onPause: "+getLifecycle().getCurrentState().name());
+   super.onPause();
+   mViewModel.isActive = false;
+}
 
-        mBillingHelper.release();
+@Override
+protected void onDestroy() {
+   // System.out.println("GOODTIME: In onDestory: "+getLifecycle().getCurrentState().name());
+   SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+   pref.unregisterOnSharedPreferenceChangeListener(this);
+   EventBus.getDefault().unregister(this);
 
-        super.onDestroy();
-    }
+   mBillingHelper.release();
 
-    @Override
-    protected void onStop() {
-        // System.out.println("GOODTIME: In onStop: "+ getLifecycle().getCurrentState().name());
-        super.onStop();
-        if(mCurrentSession.getSessionType().getValue() == SessionType.WORK) {
+   super.onDestroy();
+}
 
-            if(mCurrentSession.getTimerState().getValue() == TimerState.ACTIVE
-                || mCurrentSession.getTimerState().getValue() == TimerState.PAUSED) {
-                EventBus.getDefault().post(new Constants.FocusLostEvent());
-            }
+@Override
+protected void onStop() { 
+    // System.out.println("GOODTIME: In onStop: "+ getLifecycle().getCurrentState().name());
+    super.onStop();
+}
+
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater menuInflater = getMenuInflater();
+    menuInflater.inflate(R.menu.menu_main, menu);
+    mStatusButton = menu.findItem(R.id.action_state);
+    setupEvents();
+    return super.onCreateOptionsMenu(menu);
+}
+
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+    int id = item.getItemId();
+
+    switch (id) {
+        case android.R.id.home:
+        BottomNavigationDrawerFragment bottomNavigationDrawerFragment = new BottomNavigationDrawerFragment();
+        bottomNavigationDrawerFragment.show(getSupportFragmentManager(), bottomNavigationDrawerFragment.getTag());
+        break;
+        case R.id.action_current_label:
+        if (PreferenceHelper.isPro()) {
+            showEditLabelDialog();
+        } else {
+            launchUpgradeActivity(this);
         }
+        break;
+        case R.id.action_settings:
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
+        startActivity(settingsIntent);
+        break;
+        case R.id.action_sessions_counter:
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.action_reset_counter_title)
+        .setMessage(R.string.action_reset_counter)
+        .setPositiveButton(android.R.string.ok, (dialog, which)
+            -> mSessionViewModel.deleteSessionsFinishedToday())
+        .setNegativeButton(android.R.string.cancel, (dialog, which) -> {});
+        builder.show();
+        return true;
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_main, menu);
-        mStatusButton = menu.findItem(R.id.action_state);
-        setupEvents();
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case android.R.id.home:
-                BottomNavigationDrawerFragment bottomNavigationDrawerFragment = new BottomNavigationDrawerFragment();
-                bottomNavigationDrawerFragment.show(getSupportFragmentManager(), bottomNavigationDrawerFragment.getTag());
-                break;
-            case R.id.action_current_label:
-                if (PreferenceHelper.isPro()) {
-                    showEditLabelDialog();
-                } else {
-                    launchUpgradeActivity(this);
-                }
-                break;
-            case R.id.action_settings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                break;
-            case R.id.action_sessions_counter:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.action_reset_counter_title)
-                        .setMessage(R.string.action_reset_counter)
-                        .setPositiveButton(android.R.string.ok, (dialog, which)
-                                -> mSessionViewModel.deleteSessionsFinishedToday())
-                        .setNegativeButton(android.R.string.cancel, (dialog, which) -> {});
-                builder.show();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+    return super.onOptionsItemSelected(item);
+}
 
     private void setupEvents() {
         mCurrentSession.getDuration().observe(TimerActivity.this, this::updateTimeLabel);
@@ -457,7 +455,7 @@ public class TimerActivity
                 }
                 final Handler handler = new Handler();
                 handler.postDelayed(() -> mTimeLabel.startAnimation(
-                        loadAnimation(getApplicationContext(), R.anim.blink)), 300);
+                    loadAnimation(getApplicationContext(), R.anim.blink)), 300);
             } else {
                 if (mStatusButton != null) {
                     mStatusButton.setVisible(true);
@@ -479,9 +477,9 @@ public class TimerActivity
             } else {
                 try {
                     Toast.makeText(getBaseContext(), R.string.action_press_back_button, LENGTH_SHORT)
-                            .show();
+                    .show();
                 } catch (Throwable th) {
-                    // ignoring this exception
+                        // ignoring this exception
                 }
             }
             mBackPressedAt = System.currentTimeMillis();
@@ -520,201 +518,201 @@ public class TimerActivity
         return super.onPrepareOptionsMenu(menu);
     }
 
-    /**
-     * Called when an event is posted to the EventBus
-     * @param o holds the type of the Event
-     */
-    public void onEventMainThread(Object o) {
-        if (!PreferenceHelper.isAutoStartBreak() && o instanceof Constants.FinishWorkEvent) {
-            showFinishDialog(SessionType.WORK);
-        } else if (!PreferenceHelper.isAutoStartWork() && (o instanceof Constants.FinishBreakEvent
+        /**
+         * Called when an event is posted to the EventBus
+         * @param o holds the type of the Event
+         */
+        public void onEventMainThread(Object o) {
+            if (!PreferenceHelper.isAutoStartBreak() && o instanceof Constants.FinishWorkEvent) {
+                showFinishDialog(SessionType.WORK);
+            } else if (!PreferenceHelper.isAutoStartWork() && (o instanceof Constants.FinishBreakEvent
                 || o instanceof Constants.FinishLongBreakEvent)) {
-            showFinishDialog(SessionType.BREAK);
-        } else if (o instanceof Constants.ClearFinishDialogEvent) {
-            if (mDialogSessionFinished != null) {
-                mDialogSessionFinished.dismiss();
+                showFinishDialog(SessionType.BREAK);
+            } else if (o instanceof Constants.ClearFinishDialogEvent) {
+                if (mDialogSessionFinished != null) {
+                    mDialogSessionFinished.dismiss();
+                }
             }
         }
-    }
 
-    private void updateTimeLabel(Long millis) {
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
-        long minutes = TimeUnit.SECONDS.toMinutes(seconds);
-        seconds -= (minutes * 60);
+        private void updateTimeLabel(Long millis) {
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
+            long minutes = TimeUnit.SECONDS.toMinutes(seconds);
+            seconds -= (minutes * 60);
 
-        SpannableString currentFormattedTick;
-        boolean isMinutesStyle = PreferenceHelper.getTimerStyle().equals(getResources().getString(R.string.pref_timer_style_minutes_value));
-        if (isMinutesStyle) {
-            String currentTick = String.valueOf(TimeUnit.SECONDS.toMinutes((minutes * 60) + seconds + 59));
-            currentFormattedTick = new SpannableString(currentTick);
-            currentFormattedTick.setSpan(new RelativeSizeSpan(1.5f), 0,
+            SpannableString currentFormattedTick;
+            boolean isMinutesStyle = PreferenceHelper.getTimerStyle().equals(getResources().getString(R.string.pref_timer_style_minutes_value));
+            if (isMinutesStyle) {
+                String currentTick = String.valueOf(TimeUnit.SECONDS.toMinutes((minutes * 60) + seconds + 59));
+                currentFormattedTick = new SpannableString(currentTick);
+                currentFormattedTick.setSpan(new RelativeSizeSpan(1.5f), 0,
                     currentTick.length(), 0);
-        } else {
-            boolean isV1Style = PreferenceHelper.getTimerStyle().equals(getResources().getString(R.string.pref_timer_style_default_value));
-            final String separator =  isV1Style ? "." : ":";
-            String currentTick = (minutes > 0 ? minutes + separator : "") +
-                    format(Locale.US, "%02d", seconds);
-            currentFormattedTick = new SpannableString(currentTick);
-            if (minutes > 0) {
-                currentFormattedTick.setSpan(new RelativeSizeSpan(isV1Style ? 2f : 1.25f), 0,
-                        isV1Style ? currentTick.indexOf(separator) : currentTick.length(), 0);
             } else {
-                currentFormattedTick.setSpan(new RelativeSizeSpan(1.25f), 0, currentTick.length(), 0);
+                boolean isV1Style = PreferenceHelper.getTimerStyle().equals(getResources().getString(R.string.pref_timer_style_default_value));
+                final String separator =  isV1Style ? "." : ":";
+                String currentTick = (minutes > 0 ? minutes + separator : "") +
+                format(Locale.US, "%02d", seconds);
+                currentFormattedTick = new SpannableString(currentTick);
+                if (minutes > 0) {
+                    currentFormattedTick.setSpan(new RelativeSizeSpan(isV1Style ? 2f : 1.25f), 0,
+                        isV1Style ? currentTick.indexOf(separator) : currentTick.length(), 0);
+                } else {
+                    currentFormattedTick.setSpan(new RelativeSizeSpan(1.25f), 0, currentTick.length(), 0);
+                }
             }
+
+            mTimeLabel.setText(currentFormattedTick);
+
+            Log.v(TAG, "drawing the time label.");
+
+            if (PreferenceHelper.isScreensaverEnabled() && seconds == 1 && mCurrentSession.getTimerState().getValue() != TimerState.PAUSED) {
+                teleportTimeView();
+            }
+
         }
 
-        mTimeLabel.setText(currentFormattedTick);
-
-        Log.v(TAG, "drawing the time label.");
-
-        if (PreferenceHelper.isScreensaverEnabled() && seconds == 1 && mCurrentSession.getTimerState().getValue() != TimerState.PAUSED) {
-            teleportTimeView();
-        }
-
-    }
-
-    private void start(SessionType sessionType) {
-        Intent startIntent = new Intent();
-        switch (mCurrentSession.getTimerState().getValue()) {
-            case INACTIVE:
+        private void start(SessionType sessionType) {
+            Intent startIntent = new Intent();
+            switch (mCurrentSession.getTimerState().getValue()) {
+                case INACTIVE:
                 startIntent = new IntentWithAction(TimerActivity.this, TimerService.class,
-                        Constants.ACTION.START, sessionType);
+                    Constants.ACTION.START, sessionType);
                 toggleKeepScreenOn(PreferenceHelper.isScreenOnEnabled());
                 break;
-            case ACTIVE:
+                case ACTIVE:
                 if(!PreferenceHelper.isPauseEnabled()) return;
                 startIntent = new IntentWithAction(TimerActivity.this, TimerService.class, Constants.ACTION.TOGGLE);
                 toggleKeepScreenOn(false);
                 break;
-            case PAUSED:
+                case PAUSED:
                 startIntent = new IntentWithAction(TimerActivity.this, TimerService.class, Constants.ACTION.TOGGLE);
                 toggleKeepScreenOn(PreferenceHelper.isScreenOnEnabled());
                 break;
-            default:
+                default:
                 Log.wtf(TAG, "Invalid timer state.");
                 break;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(startIntent);
+            } else {
+                startService(startIntent);
+            }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(startIntent);
-        } else {
-            startService(startIntent);
-        }
-    }
 
-    private void stop() {
-        Intent stopIntent = new IntentWithAction(TimerActivity.this, TimerService.class, Constants.ACTION.STOP);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(stopIntent);
-        } else {
-            startService(stopIntent);
-        }
-        toggleKeepScreenOn(false);
-    }
-
-    private void add60Seconds() {
-        Intent stopIntent = new IntentWithAction(TimerActivity.this, TimerService.class, Constants.ACTION.ADD_SECONDS);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(stopIntent);
-        } else {
-            startService(stopIntent);
-        }
-    }
-
-    private void showEditLabelDialog() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        SelectLabelDialog.newInstance(this, PreferenceHelper.getCurrentSessionLabel().label, false)
-                .show(fragmentManager, DIALOG_SELECT_LABEL_TAG);
-    }
-
-    private void showFinishDialog(SessionType sessionType) {
-        if (mViewModel.isActive) {
+        private void stop() {
+            Intent stopIntent = new IntentWithAction(TimerActivity.this, TimerService.class, Constants.ACTION.STOP);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(stopIntent);
+            } else {
+                startService(stopIntent);
+            }
             toggleKeepScreenOn(false);
-            Log.i(TAG, "Showing the finish dialog.");
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            if (sessionType == SessionType.WORK) {
-                builder.setTitle(R.string.action_finished_session)
-                        .setPositiveButton(R.string.action_start_break, (dialog, which) -> {
-                            start(SessionType.BREAK);
-                            delayToggleFullscreenMode();
-                        })
-                        .setNeutralButton(R.string.dialog_close, (dialog, which) -> {
-                            EventBus.getDefault().post(new Constants.ClearNotificationEvent());
-                            delayToggleFullscreenMode();
-                        })
-                        .setOnCancelListener(dialog -> toggleFullscreenMode());
+        }
+
+        private void add60Seconds() {
+            Intent stopIntent = new IntentWithAction(TimerActivity.this, TimerService.class, Constants.ACTION.ADD_SECONDS);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(stopIntent);
             } else {
-                builder.setTitle(R.string.action_finished_break)
-                        .setPositiveButton(R.string.action_start_work, (dialog, which) -> {
-                            start(SessionType.WORK);
-                            delayToggleFullscreenMode();
-                        })
-                        .setNeutralButton(android.R.string.cancel, (dialog, which) -> {
-                            EventBus.getDefault().post(new Constants.ClearNotificationEvent());
-                            delayToggleFullscreenMode();
-                        })
-                        .setOnCancelListener(dialog -> toggleFullscreenMode());
+                startService(stopIntent);
             }
-
-            mDialogSessionFinished = builder.create();
-            mDialogSessionFinished.setCanceledOnTouchOutside(false);
-            mDialogSessionFinished.show();
-            mViewModel.dialogPendingType = SessionType.INVALID;
-        } else {
-            mViewModel.dialogPendingType = sessionType;
         }
-    }
 
-    private void toggleFullscreenMode() {
-        if (PreferenceHelper.isFullscreenEnabled()) {
-            if (mFullscreenHelper == null) {
-                mFullscreenHelper = new FullscreenHelper(findViewById(R.id.main), getSupportActionBar());
+        private void showEditLabelDialog() {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            SelectLabelDialog.newInstance(this, PreferenceHelper.getCurrentSessionLabel().label, false)
+            .show(fragmentManager, DIALOG_SELECT_LABEL_TAG);
+        }
+
+        private void showFinishDialog(SessionType sessionType) {
+            if (mViewModel.isActive) {
+                toggleKeepScreenOn(false);
+                Log.i(TAG, "Showing the finish dialog.");
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                if (sessionType == SessionType.WORK) {
+                    builder.setTitle(R.string.action_finished_session)
+                    .setPositiveButton(R.string.action_start_break, (dialog, which) -> {
+                        start(SessionType.BREAK);
+                        delayToggleFullscreenMode();
+                    })
+                    .setNeutralButton(R.string.dialog_close, (dialog, which) -> {
+                        EventBus.getDefault().post(new Constants.ClearNotificationEvent());
+                        delayToggleFullscreenMode();
+                    })
+                    .setOnCancelListener(dialog -> toggleFullscreenMode());
+                } else {
+                    builder.setTitle(R.string.action_finished_break)
+                    .setPositiveButton(R.string.action_start_work, (dialog, which) -> {
+                        start(SessionType.WORK);
+                        delayToggleFullscreenMode();
+                    })
+                    .setNeutralButton(android.R.string.cancel, (dialog, which) -> {
+                        EventBus.getDefault().post(new Constants.ClearNotificationEvent());
+                        delayToggleFullscreenMode();
+                    })
+                    .setOnCancelListener(dialog -> toggleFullscreenMode());
+                }
+
+                mDialogSessionFinished = builder.create();
+                mDialogSessionFinished.setCanceledOnTouchOutside(false);
+                mDialogSessionFinished.show();
+                mViewModel.dialogPendingType = SessionType.INVALID;
             } else {
-                mFullscreenHelper.hide();
-            }
-        } else {
-            if (mFullscreenHelper != null) {
-                mFullscreenHelper.disable();
-                mFullscreenHelper = null;
+                mViewModel.dialogPendingType = sessionType;
             }
         }
-    }
 
-    private void delayToggleFullscreenMode() {
-        final Handler handler = new Handler();
-        handler.postDelayed(this::toggleFullscreenMode, 300);
-    }
-
-    private void toggleKeepScreenOn(boolean enabled) {
-        if (enabled) {
-            getWindow().addFlags(FLAG_KEEP_SCREEN_ON);
-        } else {
-            getWindow().clearFlags(FLAG_KEEP_SCREEN_ON);
+        private void toggleFullscreenMode() {
+            if (PreferenceHelper.isFullscreenEnabled()) {
+                if (mFullscreenHelper == null) {
+                    mFullscreenHelper = new FullscreenHelper(findViewById(R.id.main), getSupportActionBar());
+                } else {
+                    mFullscreenHelper.hide();
+                }
+            } else {
+                if (mFullscreenHelper != null) {
+                    mFullscreenHelper.disable();
+                    mFullscreenHelper = null;
+                }
+            }
         }
-    }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        switch (key) {
-            case WORK_DURATION:
+        private void delayToggleFullscreenMode() {
+            final Handler handler = new Handler();
+            handler.postDelayed(this::toggleFullscreenMode, 300);
+        }
+
+        private void toggleKeepScreenOn(boolean enabled) {
+            if (enabled) {
+                getWindow().addFlags(FLAG_KEEP_SCREEN_ON);
+            } else {
+                getWindow().clearFlags(FLAG_KEEP_SCREEN_ON);
+            }
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            switch (key) {
+                case WORK_DURATION:
                 if (GoodtimeApplication.getInstance().getCurrentSession().getTimerState().getValue()
-                        == TimerState.INACTIVE) {
+                    == TimerState.INACTIVE) {
                     mCurrentSession.setDuration(TimeUnit.MINUTES.toMillis(PreferenceHelper.getSessionDuration(SessionType.WORK)));
-                }
-                break;
-        
-            // Removed case ENABLE_SCREEN_ON as we want to keep screen on only when the timer is running
+            }
+            break;
+            
+                // Removed case ENABLE_SCREEN_ON as we want to keep screen on only when the timer is running
             case ENABLE_SCREEN_ON:
-                toggleKeepScreenOn(mCurrentSession.getTimerState().getValue() == TimerState.ACTIVE ? PreferenceHelper.isScreenOnEnabled() : false);
-                break;
+            toggleKeepScreenOn(mCurrentSession.getTimerState().getValue() == TimerState.ACTIVE ? PreferenceHelper.isScreenOnEnabled() : false);
+            break;
             case AMOLED:
-                recreate();
+            recreate();
             case ENABLE_SCREENSAVER_MODE:
-                if (!PreferenceHelper.isScreensaverEnabled()) {
-                    recreate();
-                }
-                break;
+            if (!PreferenceHelper.isScreensaverEnabled()) {
+                recreate();
+            }
+            break;
             default:
-                break;
+            break;
         }
     }
 
@@ -724,10 +722,10 @@ public class TimerActivity
         if (mStatusButton != null) {
             if (labelAndColor.label != null) {
                 mStatusButton.getIcon().setColorFilter(
-                        ThemeHelper.getColor(this, labelAndColor.color), PorterDuff.Mode.SRC_ATOP);
+                    ThemeHelper.getColor(this, labelAndColor.color), PorterDuff.Mode.SRC_ATOP);
             } else {
                 mStatusButton.getIcon().setColorFilter(
-                        ThemeHelper.getColor(this, ThemeHelper.COLOR_INDEX_UNLABELED), PorterDuff.Mode.SRC_ATOP);
+                    ThemeHelper.getColor(this, ThemeHelper.COLOR_INDEX_UNLABELED), PorterDuff.Mode.SRC_ATOP);
             }
         }
     }
@@ -778,4 +776,4 @@ public class TimerActivity
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-}
+    }

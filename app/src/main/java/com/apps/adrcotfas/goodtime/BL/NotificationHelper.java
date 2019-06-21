@@ -88,9 +88,14 @@ public class NotificationHelper extends ContextWrapper {
                         .build());
     }
 
-    public void notifyFocusLost(){
+    public void notifyFocusLost() {
         Log.v(TAG, "notifyFocusLost");
         mManager.notify(FOCUS_LOST_ID, getFocusLostBuilder().build());
+    }
+
+    public void notifySessionReset() {
+        Log.v(TAG, "notifySessionReset");
+        mManager.notify(FOCUS_LOST_ID, getFocusLostSessionResetBuilder().build());
     }
 
     public void clearNotification() {
@@ -156,6 +161,22 @@ public class NotificationHelper extends ContextWrapper {
         return mBuilder;
     }
 
+    private NotificationCompat.Builder getFocusLostSessionResetBuilder(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, GOODTIME_ALERT)
+                .setSmallIcon(R.drawable.ic_status_goodtime)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setAutoCancel(true)
+                .setContentIntent(createActivityIntent())
+                .setOngoing(false)
+                .setShowWhen(false)
+                .setTimeoutAfter(10000)
+                .setOnlyAlertOnce(true);
+        builder.setContentTitle(getString(R.string.action_progress_lost_title))
+            .setContentText(getString(R.string.action_progress_lost_text));
+            return builder;
+    }
 
     private NotificationCompat.Builder getFocusLostBuilder(){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, GOODTIME_ALERT)
@@ -166,7 +187,9 @@ public class NotificationHelper extends ContextWrapper {
                 .setAutoCancel(true)
                 .setContentIntent(createActivityIntent())
                 .setOngoing(false)
-                .setShowWhen(false);
+                .setShowWhen(false)
+                .setTimeoutAfter(10000)
+                .setOnlyAlertOnce(true);
         String[] motivationStringArray = mContext.getResources().getStringArray(R.array.action_motivation_array);
         builder.setContentTitle(getString(R.string.action_focus_lost))
             .setContentText( motivationStringArray[new Random().nextInt(motivationStringArray.length)]);
