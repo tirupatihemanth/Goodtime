@@ -14,6 +14,7 @@
 package com.apps.adrcotfas.goodtime.BL;
 
 import android.app.Application;
+import android.os.PowerManager;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.Lifecycle;
@@ -38,6 +39,7 @@ public class GoodtimeApplication extends Application implements LifecycleObserve
     private static volatile GoodtimeApplication INSTANCE;
     private static CurrentSessionManager mCurrentSessionManager;
     private static SharedPreferences mPreferences;
+    private static PowerManager mPowerManager;
 
     public static GoodtimeApplication getInstance() {
         return INSTANCE;
@@ -58,6 +60,7 @@ public class GoodtimeApplication extends Application implements LifecycleObserve
         mCurrentSessionManager = new CurrentSessionManager(this, new CurrentSession(TimeUnit.MINUTES.toMillis(
                 PreferenceManager.getDefaultSharedPreferences(this)
                         .getInt(WORK_DURATION, DEFAULT_WORK_DURATION_DEFAULT))));
+        mPowerManager = (PowerManager)getSystemService(POWER_SERVICE);
 
     }
 
@@ -65,7 +68,8 @@ public class GoodtimeApplication extends Application implements LifecycleObserve
     void onAppBackground() {
         final CurrentSession currentSession = getCurrentSession();
         if(currentSession.getSessionType().getValue() == SessionType.WORK
-            && currentSession.getTimerState().getValue() == TimerState.ACTIVE) {
+            && currentSession.getTimerState().getValue() == TimerState.ACTIVE
+            && mPowerManager.isScreenOn()) {
             (new NotificationHelper(getApplicationContext())).notifyFocusLost();
                 mCurrentSessionManager.scheduleFocusLostAlarm();
         }
